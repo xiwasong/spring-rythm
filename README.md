@@ -1,4 +1,4 @@
 spring-rythm
 ============
 
-Enable SpringFramework application developer to use Rythm template engine
+is my private spring-rythm branch.
