@@ -2,9 +2,11 @@ package org.rythmengine.spring.web.result;
 
 import org.springframework.http.HttpStatus;
 
+
 /**
  * Created by luog on 30/12/13.
  */
+@SuppressWarnings("serial")
 public class BadRequest extends Result {
 
     /**

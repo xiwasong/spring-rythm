@@ -1,9 +1,16 @@
 package org.rythmengine.spring.web;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.osgl._;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.spring.web.result.Result;
-import org.rythmengine.spring.web.util.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -17,13 +24,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by luog on 4/12/13.
@@ -42,7 +42,7 @@ public class RythmExceptionHandler implements MessageSourceAware {
     }
 
     public void setMessageSource(MessageSource messageSource) {
-        this.messageSource = messageSource;
+        RythmExceptionHandler.messageSource = messageSource;
     }
 
     RythmEngine engine;
@@ -75,8 +75,8 @@ public class RythmExceptionHandler implements MessageSourceAware {
             int statusCode = responseStatus.value().value();
             boolean isError = Result.isError(statusCode);
             String reason = responseStatus.reason();
-            if (this.messageSource != null) {
-                reason = this.messageSource.getMessage(reason, null, reason, LocaleContextHolder.getLocale());
+            if (RythmExceptionHandler.messageSource != null) {
+                reason = RythmExceptionHandler.messageSource.getMessage(reason, null, reason, LocaleContextHolder.getLocale());
             }
             ModelAndView modelAndView = new ModelAndView();
             if (isError) {

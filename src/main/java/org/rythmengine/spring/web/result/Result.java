@@ -13,12 +13,14 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Arrays;
 
 /**
  * Created by luog on 16/01/14.
  */
+@SuppressWarnings("serial")
 public class Result extends FastRuntimeException {
 
     private static int[] errorCodes = {

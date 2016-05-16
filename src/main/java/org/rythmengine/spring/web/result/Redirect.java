@@ -6,11 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
  * Created by luog on 30/12/13.
  */
+@SuppressWarnings("serial")
 public class Redirect extends Result {
 
     /**

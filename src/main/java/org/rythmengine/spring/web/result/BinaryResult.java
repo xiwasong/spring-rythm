@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import static org.rythmengine.spring.web.HttpHeaders.CONTENT_LENGTH;
 /**
  * Created by luog on 22/05/2014.
  */
+@SuppressWarnings("serial")
 public class BinaryResult extends Result {
     private static enum Disposition {
         inline, attachment;

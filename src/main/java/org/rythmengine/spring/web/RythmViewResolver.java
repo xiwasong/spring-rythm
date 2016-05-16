@@ -18,7 +18,7 @@ public class RythmViewResolver extends AbstractTemplateViewResolver {
    	/**
    	 * Requires {@link RythmView}.
    	 */
-   	@Override
+	@Override
    	protected Class requiredViewClass() {
    		return RythmView.class;
    	}

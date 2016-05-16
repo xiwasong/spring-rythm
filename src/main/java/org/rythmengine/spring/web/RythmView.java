@@ -1,12 +1,25 @@
 package org.rythmengine.spring.web;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.io.FileUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.exception.RythmException;
-import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.TemplateResourceManager;
 import org.rythmengine.template.TemplateBase;
+import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.IO;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -15,13 +28,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.view.AbstractTemplateView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,8 +43,6 @@ public class RythmView extends AbstractTemplateView {
     private ITemplateResource rsrc;
 
     private TemplateClass tc;
-
-    private ICodeType codeType;
 
     private boolean outputReqParams = false;
 
@@ -138,7 +142,7 @@ public class RythmView extends AbstractTemplateView {
             tc = engine.getTemplateClass(rsrc);
             String fullName = tc.getTagName();
             engine.registerTemplate(fullName, tc.asTemplate(engine));
-            codeType = rsrc.codeType(engine);
+            rsrc.codeType(engine);
             re = null;
             return true;
         } catch (RythmException e) {
@@ -178,6 +182,12 @@ public class RythmView extends AbstractTemplateView {
 
     @Override
     protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	//ignore redirect action
+    	Object redirectUrl= request.getAttribute(RythmConfigurer.MARK_RESPONSE_IS_REDIRECTED);
+    	if(redirectUrl!=null){
+    		return;
+    	}
+    	
         RythmEngine engine = this.engine;
         Map<String, Object> params = new HashMap<String, Object>();
         if (null != re) {
@@ -185,8 +195,9 @@ public class RythmView extends AbstractTemplateView {
             if (null != re) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 prepareImplicitArgs(params, request, response);
-                params.put("exception", re);
-                engine.render(response.getOutputStream(), "errors/500.html", params);
+                String errorStr=Escape.HTML.apply(re.toString()).data;
+                engine.render(response.getOutputStream(), getErrorTemplate(), errorStr);
+                logger.error(re);
                 return;
             }
         }
@@ -200,7 +211,7 @@ public class RythmView extends AbstractTemplateView {
             }
             TemplateBase t = (TemplateBase) tc.asTemplate(engine);
             if (outputReqParams) {
-                Map reqMap = request.getParameterMap();
+                Map<?, ?> reqMap = request.getParameterMap();
                 for (Object o : reqMap.keySet()) {
                     String k = o.toString();
                     String[] va = request.getParameterValues(k);
@@ -226,9 +237,27 @@ public class RythmView extends AbstractTemplateView {
             }
         } catch (RythmException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            engine.render(response.getOutputStream(), "errors/500.html", e);
+            String errorStr=Escape.HTML.apply(e.toString()).data;
+            engine.render(response.getOutputStream(), getErrorTemplate(), errorStr);
+            logger.error(e);
         } finally {
             RythmEngine.renderCleanUp();
         }
+    }
+    
+    private String getErrorTemplate(){
+    	//get home.template.dir
+    	List<URI> templatePaths=getRythmEngine().conf().get("home.template.dir");
+    	String templatePath="";
+    	if(templatePaths!=null && templatePaths.size()>0){
+    		templatePath=templatePaths.get(0).getPath();
+    	}
+    	String errorTemplate="";
+		try {
+			errorTemplate = FileUtils.readFileToString(new File(templatePath+File.separator+"500.html"), "utf-8");
+		} catch (IOException e) {
+			logger.warn("error template file \"500.html\" not found in home.template.dir!");
+		}
+    	return errorTemplate;
     }
 }

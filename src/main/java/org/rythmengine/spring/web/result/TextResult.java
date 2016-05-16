@@ -6,11 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
  * Created by luog on 26/02/14.
  */
+@SuppressWarnings("serial")
 public class TextResult extends Result {
     private String text;
     public TextResult(String text) {

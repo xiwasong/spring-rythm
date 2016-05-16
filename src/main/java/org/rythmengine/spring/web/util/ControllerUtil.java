@@ -1,15 +1,26 @@
 package org.rythmengine.spring.web.util;
 
-import org.osgl.util.S;
-import org.osgl.web.util.UserAgent;
-import org.rythmengine.spring.web.*;
-import org.rythmengine.spring.web.result.*;
+import java.io.File;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.InputStream;
-import java.util.Map;
+
+import org.osgl.util.S;
+import org.osgl.web.util.UserAgent;
+import org.rythmengine.spring.web.Flash;
+import org.rythmengine.spring.web.HttpUtils;
+import org.rythmengine.spring.web.ServerContext;
+import org.rythmengine.spring.web.Session;
+import org.rythmengine.spring.web.SessionManager;
+import org.rythmengine.spring.web.UADetector;
+import org.rythmengine.spring.web.result.BadRequest;
+import org.rythmengine.spring.web.result.BinaryResult;
+import org.rythmengine.spring.web.result.Forbidden;
+import org.rythmengine.spring.web.result.NotFound;
+import org.rythmengine.spring.web.result.Ok;
+import org.rythmengine.spring.web.result.Redirect;
+import org.rythmengine.spring.web.result.TextResult;
 
 /**
  * The base controller class provides utility methods to
@@ -191,30 +202,6 @@ public abstract class ControllerUtil {
         throw new BinaryResult(file, name);
     }
 
-    protected static void renderJSON() {
-        renderJSON("{}");
-    }
-
-    protected static void renderJSON(String json) {
-        throw new JSONResult(json);
-    }
-
-    protected static void renderJSON(String tmpl, Object[] args) {
-        renderJSON(String.format(tmpl, args));
-    }
-
-    protected static void renderJSON(Object obj) {
-        throw new JSONResult(obj);
-    }
-
-    protected static void renderJSON(Map<String, Object> map) {
-        throw new JSONResult(map);
-    }
-
-    protected static void renderJSON(Object... objs) {
-        throw new JSONResult(objs);
-    }
-
     protected static void redirect(String url) {
         throw new Redirect(url);
     }
@@ -262,7 +249,8 @@ public abstract class ControllerUtil {
     private static class Context {
         String serverName;
         int port;
-        int securePort;
+        @SuppressWarnings("unused")
+		int securePort;
         String ctxPath;
 
         Context(String serverName, int port, int securePort, String ctxtPath) {

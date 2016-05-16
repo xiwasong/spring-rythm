@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by luog on 30/12/13.
  */
+@SuppressWarnings("serial")
 public class Ok extends Result {
 
     /**

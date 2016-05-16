@@ -1,5 +1,15 @@
 package org.rythmengine.spring.web;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
@@ -23,12 +33,17 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.config.annotation.*;
-
-import javax.servlet.ServletContext;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -68,6 +83,8 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public static final String CONF_CSRF_PARAM_NAME = "csrfParameterName";
 
     public static final String CONF_CSRF_HEADER_NAME = "csrfHeaderName";
+    
+    public static final String MARK_RESPONSE_IS_REDIRECTED = "markResonseIsRedirected";
 
     private static RythmEngine engine;
 
@@ -108,7 +125,7 @@ public class RythmConfigurer extends RythmEngineFactory implements
     }
 
     public void setRythmEngine(RythmEngine engine) {
-        this.engine = engine;
+        RythmConfigurer.engine = engine;
     }
 
     @Override
@@ -152,9 +169,10 @@ public class RythmConfigurer extends RythmEngineFactory implements
         return enableSessionManager;
     }
 
-    public void setSecretKeySensor(String secretKeySensor) throws Exception {
+    @SuppressWarnings("unchecked")
+	public void setSecretKeySensor(String secretKeySensor) throws Exception {
         Class<SecretKeySensor> c = (Class<SecretKeySensor>) Class.forName(secretKeySensor);
-        this.secretKeySensor = c.newInstance();
+        RythmConfigurer.secretKeySensor = c.newInstance();
     }
 
     private SecretKeySensor getSecretKeySensor() {
@@ -411,4 +429,28 @@ public class RythmConfigurer extends RythmEngineFactory implements
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 
     }
+
+	@Override
+	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void configureViewResolvers(ViewResolverRegistry registry) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		// TODO Auto-generated method stub
+		
+	}
 }
